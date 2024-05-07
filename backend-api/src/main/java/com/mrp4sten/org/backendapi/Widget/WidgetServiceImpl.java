@@ -13,6 +13,12 @@ public class WidgetServiceImpl implements WidgetService {
     this.widgetRepository = widgetRepository;
   }
 
+  /**
+   * Create widget
+   *
+   * @param widget
+   * @return Widget
+   */
   @Override
   public Widget createWidget(Widget widget) {
     Optional<Widget> widgetOptional = widgetRepository.findByName(widget.getName());
@@ -23,16 +29,34 @@ public class WidgetServiceImpl implements WidgetService {
     return widgetRepository.save(widget);
   }
 
+  /**
+   * Get all widgets
+   *
+   * @return List of widgets
+   */
   @Override
   public List<Widget> getWidgets() {
     return widgetRepository.findAll();
   }
 
+  /**
+   * Get widget by name
+   *
+   * @param name
+   * @return Widget
+   */
   @Override
   public Optional<Widget> getWidget(String name) {
     return widgetRepository.findByName(name);
   }
 
+  /**
+   * Update widget by name
+   *
+   * @param name
+   * @param updatedWidget
+   * @return Widget
+   */
   @Override
   public Widget updateWidget(String name, Widget updatedWidget) {
     return widgetRepository.findByName(name)
@@ -45,6 +69,13 @@ public class WidgetServiceImpl implements WidgetService {
         .orElseThrow(() -> new IllegalArgumentException("Widget not found with name " + name));
   }
 
+
+  /**
+   * Delete widget by name
+   *
+   * @param name
+   * @return void
+   */
   @Override
   public void deleteWidget(String name) {
     Widget widget = widgetRepository.findByName(name)
