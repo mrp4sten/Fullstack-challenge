@@ -1,46 +1,59 @@
 package com.mrp4sten.org.backendapi.Widget;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/widget")
+@RequestMapping("/api/widgets")
 public class WidgetController {
-  private final WidgetService widgetService;
+  private WidgetService widgetService;
 
-  @Autowired
   public WidgetController(WidgetService widgetService) {
     this.widgetService = widgetService;
   }
 
   @PostMapping
-  public WidgetDTO createWidget(WidgetDTO widgetDTO) {
-    return widgetService.createWidget(widgetDTO);
+  @ResponseStatus(HttpStatus.CREATED)
+  public Widget createWidget(@RequestBody Widget widget) {
+    return widgetService.createWidget(widget);
   }
 
   @GetMapping
-  public Iterable<WidgetDTO> getWidgets() {
+  public List<Widget> getWidgets() {
     return widgetService.getWidgets();
   }
 
-  @GetMapping
-  public WidgetDTO getWidget(String name) {
-    return widgetService.getWidget(name);
+  @GetMapping("/{name}")
+  public ResponseEntity<Widget> getWidget(@PathVariable("name") String name) {
+    return widgetService.getWidget(name)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @PutMapping
-  public WidgetDTO updateWidget(WidgetDTO widgetDTO) {
-    return widgetService.updateWidget(widgetDTO);
+  @PutMapping("/{name}")
+  public ResponseEntity<Widget> updateWidget(@PathVariable String name, @RequestBody Widget updatedWidget) {
+    try {
+      Widget widget = widgetService.updateWidget(name, updatedWidget);
+      return new ResponseEntity<>(widget, HttpStatus.OK);
+    } catch (IllegalArgumentException e) {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
   }
 
-  @DeleteMapping
-  public void deleteWidget(String name) {
+  @DeleteMapping("/{name}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteWidget(@PathVariable String name) {
     widgetService.deleteWidget(name);
   }
-
 }
